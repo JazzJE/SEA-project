@@ -39,7 +39,7 @@ async function initializeCards()
   cardArray = await parseBooks();
 
   // initialize event listener for filtering
-  const categoryDropdown = document.getElementById('categorySelection');
+  const categoryDropdown = document.getElementById('categoryDropdown');
   let categoryOptions = [];
 
   // get all the categories that are possible within the data set
@@ -55,7 +55,8 @@ async function initializeCards()
   }
 
   // when the user inputs a value to filter with, re-render the displayed cards only with those categories
-  categoryDropdown.addEventListener('input', function() {
+  const categoryInput = document.getElementById('categoryInput');
+  categoryInput.addEventListener('input', function() {
     if (categoryOptions.includes(this.value))
     {
       // if the object's category is not the same as the inputted one, then delete that object from the displayed cards list

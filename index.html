@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>LA TV Shows | Home</title>
+    <title>Discover A New Book!</title>
     <meta name="description" content="A Catalog of Shows Set in Los Angeles" />
     <link rel="stylesheet" href="style.css" />
     <script type="text/javascript" src="scripts.js"></script>
@@ -9,23 +9,33 @@
 
   <body>
     <header class="main-header">
-      <h1 class="title">LA TV Shows</h1>
+      <h1 class="title">Discover A New Book!</h1>
     </header>
     <div id="card-container"></div>
     <div class="card" style="display: none">
       <div class="card-content">
-        <h2>TV Show Title</h2>
-        <img src="" alt="TV Show Poster" />
+        <h2>Book Title</h2>
+        <img src="" alt="Book Image" />
         <ul>
-          <li>Bullet Point 1</li>
-          <li>Bullet Point 2</li>
-          <li>Bullet Point 3</li>
+          <li>Author</li>
+          <li>Category</li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
         </ul>
+        <button>Purchase!</button>
       </div>
     </div>
     <div class="footer">
-      <button onclick="quoteAlert();">Get A Quote!</button>
       <button onclick="removeLastCard();">Remove A Card!</button>
+      <button onclick="addCard();">Add Ten Books!</button>
+      <div>
+        <label for="categoryDropdown">Filter Displayed Books (Category): </label>
+        <input list="categoryDropdown" id="categoryInput" placeholder="Type or select a category...">
+        <datalist id="categoryDropdown"></datalist>
+      </div>
+      <button onclick="sortByPrice();">Sort by Price (Lowest To Highest) !</button>
     </div>
   </body>
 </html>
