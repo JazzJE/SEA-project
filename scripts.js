@@ -4,47 +4,24 @@ let cardArray = [];
 // array that will store all the indices of the book objects already displayed
 let displayedCardsIndices = [];
 
-// initialize arrays and relevant buttons
-document.addEventListener("DOMContentLoaded", initializeCards());
+// array that will store all the categories possible in the book indices stored as elements displayedCardsIndices array
+let categoryOptions = [];
 
-// initialize the cards when the page is first loaded
-async function initializeCards()
+// initialize arrays and relevant buttons
+document.addEventListener("DOMContentLoaded", init());
+
+// initialization function
+async function init()
 {
   // cardArray will store all each book as objects
   cardArray = await parseBooks();
 
-  const categoryDropdown = document.getElementById('categoryDropdown');
-  
-  // get all the categories that are possible within the data set
-  let categoryOptions = [];
-  for (let i = 0; i < cardArray.length; i++) if (!(categoryOptions.includes(cardArray[i].category))) 
-    categoryOptions.push(cardArray[i].category);
-
-  // for every category possible, create an option for it and append it to the dropdown menu
-  for (let i = 0; i < categoryOptions.length; i++)
-  {
-    newOption = document.createElement("option");
-    newOption.value = categoryOptions[i];
-    categoryDropdown.appendChild(newOption);
-  }
-
-  // event listener for when the user inputs a value to filter with, re-render the displayed cards only with those categories
+  // clear the category dropdown when selected
   const categoryInput = document.getElementById('categoryInput');
-  categoryInput.addEventListener('input', function() {
-    if (categoryOptions.includes(this.value))
-    {
-      for (let i = 0; i < displayedCardsIndices.length; i++)
-      {
-        if (cardArray[displayedCardsIndices[i]].category != this.value)
-        {
-          displayedCardsIndices.splice(i, 1);
-          i--;
-        }
-      }
-      showCards();
-    }
-
-  })
+  categoryInput.addEventListener('click', function ()
+  {
+    this.value = '';
+  });
 
   // initialize cards for when website first loads
   addCards();
@@ -56,7 +33,7 @@ async function parseBooks()
   const response = await fetch("Amazon_popular_books_dataset.json");
   const bookObjectArray = await response.json();
 
-  // only get the relevant fields for our objects
+  // only get the relevant fields for each book
   modifiedBookObjectArray = bookObjectArray.map(book =>
     (
       {
@@ -82,7 +59,7 @@ function showCards()
   cardContainer.innerHTML = "";
   const templateCard = document.querySelector(".card");
 
-  // display every object that has an index stored as an element inside of the displayedCardsIndices array
+  // display every book that has an index stored as an element inside of the displayedCardsIndices array
   for (let i = 0; i < displayedCardsIndices.length; i++) 
   {
     const nextCard = templateCard.cloneNode(true); // Copy the template card
@@ -103,6 +80,8 @@ function showCards()
     ); // edit the card with relevant information
     cardContainer.appendChild(nextCard); // Add new card to the container
   }
+
+  updateCategoryDropdown();
 }
 
 // function to delete the last card and redisplay
@@ -156,7 +135,7 @@ function editCardContent({card, imageURL, title, category, ISBN, price, rating, 
 
   const purchaseButton = card.querySelector("button");
 
-  // when the user clicks on the button, send them to the relevant Amazon url to purchase
+  // when the user clicks on the purchase button, send them to the relevant Amazon url to purchase
   purchaseButton.addEventListener
   (
     "click", 
@@ -189,7 +168,7 @@ function addCards()
       let rand = Math.floor(Math.random() * cardArray.length);
 
       // ensure that the random book indice is not already an element inside of the displayedCardsIndices array
-      // if already displayed, then reassign rand to a new index and reperform check through the array
+      // if already inside (ergo displayed), then reassign rand to a new book index and reperform check through the array
       for (let i = 0; i < displayedCardsIndices.length; i++)
       {
         if (rand == displayedCardsIndices[i])
@@ -222,17 +201,18 @@ function addCards()
       cardContainer.appendChild(nextCard); // Add new card to the container
     }
   }
+
+  updateCategoryDropdown();
 }
 
 // sort the displayed cards from lowest to highest price using linear sort
 function sortByPrice()
 {
   // this is a range value so that when objects with null prices are appended to the end of the displayedCardIndices list,
-  // we can exclude these objects from being observed and sorted, displayed at the end of the sort
+  // we can exclude these objects from being observed and sorted
   let sortRange = displayedCardsIndices.length;
   
   // place all the objects with unknown values for price at the end of the displayed cards
-  // also reduce the elements that we will thus sort and ignore these unknown prices by decreasing the sort range
   for (let i = 0; i < sortRange; i++)
   {
     if (cardArray[displayedCardsIndices[i]].price == "unknown") 
@@ -243,25 +223,70 @@ function sortByPrice()
     }
   }
 
-  // for all the values that we want to sort, use a linear sort to order them from smallest to greatest
+  // use a linear sort to sort the books that we know from smallest to greatest in price
   for (let i = 0; i < sortRange - 1; i++)
   {
     // initialize the object with the smallest price as the index stored in the first element of the displayedCardsIndices array
     let minIndex = i;
 
-    // for every subsequent indice stored as elements in displayedCardsIndices from the minIndex to the sortRange
-    // check if the object stored in the index element
+    // for every subsequent indice stored as elements in displayedCardsIndices, check if the book indice is already displayed
     for (let j = i + 1; j < sortRange; j++)
     {
       if (cardArray[displayedCardsIndices[minIndex]].price > cardArray[displayedCardsIndices[j]].price) minIndex = j;
     }
 
-    // swap function to switch the index stored in the (i)th element and the (minIndex)th element of the displayedCardsIndices
+    // swap function to switch the minimum value with the current value we are at
     let temp = displayedCardsIndices[i];
     displayedCardsIndices[i] = displayedCardsIndices[minIndex];
     displayedCardsIndices[minIndex] = temp;
+    
   }
 
   // update the displayed cards
   showCards();
 }
+
+// update the dropdown menu to only the elements that are displayed
+function updateCategoryDropdown()
+{
+  const categoryDropdown = document.getElementById('categoryDropdown');
+  categoryDropdown.innerHTML = "";
+
+  // reset the categoryOptions
+  categoryOptions.length = 0;
+
+  // get all the categories that are possible within the displayedCards
+  for (let i = 0; i < displayedCardsIndices.length; i++) if (!(categoryOptions.includes(cardArray[displayedCardsIndices[i]].category))) 
+    categoryOptions.push(cardArray[displayedCardsIndices[i]].category);
+
+  // for every displayed card category possible, create an option for it and append it to the dropdown menu
+  for (let i = 0; i < categoryOptions.length; i++)
+  {
+    newOption = document.createElement("option");
+    newOption.value = categoryOptions[i];
+    categoryDropdown.appendChild(newOption);
+  }
+
+  // event listener for when the user inputs a value to filter with, re-render the displayed cards only with those categories
+  const categoryInput = document.getElementById('categoryInput');
+  categoryInput.removeEventListener('input', filterBooks);
+  categoryInput.addEventListener('input', filterBooks);
+}
+
+// filter the books based on the category inputted within the dropdown list and the categories that are possible in the categoryOptions
+function filterBooks(obj)
+  {
+    const value = obj.target.value;
+    if (categoryOptions.includes(value))
+      {
+        for (let i = 0; i < displayedCardsIndices.length; i++)
+        {
+          if (cardArray[displayedCardsIndices[i]].category != value)
+          {
+            displayedCardsIndices.splice(i, 1);
+            i--;
+          }
+        }
+        showCards();
+    }
+  }
