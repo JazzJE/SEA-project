@@ -22,15 +22,15 @@ body {
   display: flex;
   justify-content: center;
   margin: 20px;
-  flex-wrap: auto;
+  flex-wrap: wrap;
 }
 
 .card {
-  width: 300px;
+  width: 25vw;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 5px;
+  margin: 30px;
 }
 
 .card-content {
@@ -68,4 +68,9 @@ button {
   font-size: 22px;
   cursor: pointer;
   margin: 5px;
+}
+
+ul
+{
+  style:none;
 }

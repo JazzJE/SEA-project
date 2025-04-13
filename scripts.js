@@ -88,7 +88,7 @@ async function parseBooks()
   modifiedBookObjectArray = bookObjectArray.map(book =>
     (
       {
-        ISBN: book.ISBN10,
+        ISBN: book.ISBN10 ?? "N/A",
         price: book.final_price,
         imageURL: book.image_url,
         rating: book.rating,
@@ -182,7 +182,7 @@ function editCardContent({card, imageURL, title, category, ISBN, price, rating, 
   ISBNPoint.innerHTML = '<b>ISBN #: </b>' + ISBN;
 
   const pricePoint = card.querySelector("li:nth-child(6)");
-  pricePoint.innerHTML = '<b>2022 Price: </b>$' + price;
+  pricePoint.innerHTML = '<b>Price (2022): </b>$' + price;
 
   const purchaseButton = card.querySelector("button");
   purchaseButton.addEventListener
