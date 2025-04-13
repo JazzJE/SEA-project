@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Discover A New Book!</title>
+    <title>Discover New Books!</title>
     <meta name="description" content="A Catalog of Shows Set in Los Angeles" />
     <link rel="stylesheet" href="style.css" />
     <script type="text/javascript" src="scripts.js"></script>
@@ -9,7 +9,15 @@
 
   <body>
     <header class="main-header">
-      <h1 class="title">Discover A New Book!</h1>
+      <h1 class="title">Discover New Books!</h1>
+      <button onclick="removeLastCard();">Remove A Book!</button>
+      <button onclick="addCard();">Add Ten Books!</button>
+      <div>
+        <label for="categoryDropdown">Filter Displayed Books (Category): </label>
+        <input list="categoryDropdown" id="categoryInput" placeholder="Type or select a category...">
+        <datalist id="categoryDropdown"></datalist>
+      </div>
+      <button onclick="sortByPrice();">Sort by Price!</button>
     </header>
     <div id="card-container"></div>
     <div class="card" style="display: none">
@@ -28,14 +36,6 @@
       </div>
     </div>
     <div class="footer">
-      <button onclick="removeLastCard();">Remove A Card!</button>
-      <button onclick="addCard();">Add Ten Books!</button>
-      <div>
-        <label for="categoryDropdown">Filter Displayed Books (Category): </label>
-        <input list="categoryDropdown" id="categoryInput" placeholder="Type or select a category...">
-        <datalist id="categoryDropdown"></datalist>
-      </div>
-      <button onclick="sortByPrice();">Sort by Price (Lowest To Highest) !</button>
     </div>
   </body>
 </html>

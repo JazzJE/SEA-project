@@ -70,7 +70,11 @@ button {
   margin: 5px;
 }
 
-ul
-{
-  style:none;
+ul {
+  list-style-type:none;
+  padding-left:0;
+}
+
+li {
+  margin:1.5vh;
 }
