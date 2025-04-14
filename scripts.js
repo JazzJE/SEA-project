@@ -1,10 +1,10 @@
 // array that will store all the book objects
-let cardArray = [];
+let bookArray = [];
 
 // array that will store all the indices of the book objects already displayed
-let displayedCardsIndices = [];
+let displayedBooksIndices = [];
 
-// array that will store all the categories possible book objects indices stored in displayedCardsIndices
+// array that will store all the categories possible book objects indices stored in displayedBooksIndices
 let categoryOptions = [];
 
 // initialize arrays and event listener
@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", init());
 // initialization function
 async function init()
 {
-  // parse the dataset and assin to cardArray
-  cardArray = await parseBooks();
+  // parse the dataset and assin to bookArray
+  bookArray = await parseBooks();
 
   // event listener so when user clicks on the filter input, the value is cleared for them to type
   const categoryInput = document.getElementById('categoryInput');
@@ -63,25 +63,25 @@ function showCards()
   cardContainer.innerHTML = "";
   const templateCard = document.querySelector(".card");
 
-  // display every book that has an index stored as an element inside of the displayedCardsIndices array
-  for (let i = 0; i < displayedCardsIndices.length; i++) 
+  // display every book that has an index stored as an element inside of the displayedBooksIndices array
+  for (let i = 0; i < displayedBooksIndices.length; i++) 
   {
     const nextCard = templateCard.cloneNode(true); // Copy the template card
     editCardContent
     (
       {
         card: nextCard, 
-        ISBN: cardArray[displayedCardsIndices[i]].ISBN, 
-        imageURL: cardArray[displayedCardsIndices[i]].imageURL, 
-        title: cardArray[displayedCardsIndices[i]].title,
-        author: cardArray[displayedCardsIndices[i]].author,
-        category: cardArray[displayedCardsIndices[i]].category,
-        price: cardArray[displayedCardsIndices[i]].price,
-        rating: cardArray[displayedCardsIndices[i]].rating,
-        reviewsCount: cardArray[displayedCardsIndices[i]].reviewsCount,
-        url: cardArray[displayedCardsIndices[i]].url,
+        ISBN: bookArray[displayedBooksIndices[i]].ISBN, 
+        imageURL: bookArray[displayedBooksIndices[i]].imageURL, 
+        title: bookArray[displayedBooksIndices[i]].title,
+        author: bookArray[displayedBooksIndices[i]].author,
+        category: bookArray[displayedBooksIndices[i]].category,
+        price: bookArray[displayedBooksIndices[i]].price,
+        rating: bookArray[displayedBooksIndices[i]].rating,
+        reviewsCount: bookArray[displayedBooksIndices[i]].reviewsCount,
+        url: bookArray[displayedBooksIndices[i]].url,
       }
-    ); // edit the card to have the book object i's information stored as an element of displayedCardsIndices
+    ); // edit the card to have the book object i's information stored as an element of displayedBooksIndices
     cardContainer.appendChild(nextCard); // add the new card to the container
   }
 
@@ -93,7 +93,7 @@ function showCards()
 function removeLastCard() 
 {
   // check if there actually are any cards being displayed
-  if (displayedCardsIndices.length == 0)
+  if (displayedBooksIndices.length == 0)
   {
     alert("[ERROR] There are no cards currently displayed!");
   }
@@ -101,7 +101,7 @@ function removeLastCard()
   // else, continue to remove the last card and re-render the cards
   else
   {
-    displayedCardsIndices.pop();
+    displayedBooksIndices.pop();
     showCards();
   }
 }
@@ -155,7 +155,7 @@ function addCards()
   {
     
     // if all the cards are displayed, simply do nothing and output an error
-    if (cardArray.length == displayedCardsIndices.length)
+    if (bookArray.length == displayedBooksIndices.length)
     {
       alert("[ERROR] All the cards are displayed!");
       break;
@@ -168,21 +168,21 @@ function addCards()
       const templateCard = document.querySelector(".card");
 
       // generate a random book index within the range of the data set
-      let rand = Math.floor(Math.random() * cardArray.length);
+      let rand = Math.floor(Math.random() * bookArray.length);
 
-      // ensure that the random indice is not already an element inside of the displayedCardsIndices array
+      // ensure that the random indice is not already an element inside of the displayedBooksIndices array
       // if already inside (ergo displayed), then reassign rand to a new book index and reperform if the new values is in the array
-      for (let i = 0; i < displayedCardsIndices.length; i++)
+      for (let i = 0; i < displayedBooksIndices.length; i++)
       {
-        if (rand == displayedCardsIndices[i])
+        if (rand == displayedBooksIndices[i])
         {
-          rand = Math.floor(Math.random() * cardArray.length);
+          rand = Math.floor(Math.random() * bookArray.length);
           i = -1;
         }
       }
 
       // add the random/new book index to the array of displayed indices
-      displayedCardsIndices.push(rand);
+      displayedBooksIndices.push(rand);
 
       // create the new card with the random book index
       const nextCard = templateCard.cloneNode(true); // copy template
@@ -190,15 +190,15 @@ function addCards()
       (
         {
         card: nextCard,
-        ISBN: cardArray[rand].ISBN, 
-        imageURL: cardArray[rand].imageURL, 
-        title: cardArray[rand].title,
-        author: cardArray[rand].author,
-        category: cardArray[rand].category,
-        price: cardArray[rand].price,
-        rating: cardArray[rand].rating,
-        reviewsCount: cardArray[rand].reviewsCount,
-        url: cardArray[rand].url,
+        ISBN: bookArray[rand].ISBN, 
+        imageURL: bookArray[rand].imageURL, 
+        title: bookArray[rand].title,
+        author: bookArray[rand].author,
+        category: bookArray[rand].category,
+        price: bookArray[rand].price,
+        rating: bookArray[rand].rating,
+        reviewsCount: bookArray[rand].reviewsCount,
+        url: bookArray[rand].url,
         }
       ); // edit the card with index rand's object
       cardContainer.appendChild(nextCard); // add new card to the container
@@ -214,14 +214,14 @@ function sortByPrice()
 {
   // this is a range value so that when objects with null prices are appended to the end of the displayedCardIndices list,
   // we can exclude these objects from being observed and sorted
-  let sortRange = displayedCardsIndices.length;
+  let sortRange = displayedBooksIndices.length;
   
   // place all the objects with unknown values for price at the end of the displayed cards, and decrease the range we will sort through
   for (let i = 0; i < sortRange; i++)
   {
-    if (cardArray[displayedCardsIndices[i]].price == "unknown") 
+    if (bookArray[displayedBooksIndices[i]].price == "unknown") 
     {
-      displayedCardsIndices.push((displayedCardsIndices.splice(i, 1))[0]);
+      displayedBooksIndices.push((displayedBooksIndices.splice(i, 1))[0]);
       i--;
       sortRange--;
     }
@@ -230,20 +230,20 @@ function sortByPrice()
   // use a linear sort to sort the books that we know from smallest to greatest in price
   for (let i = 0; i < sortRange - 1; i++)
   {
-    // initialize the object with the smallest price as the index stored in the first element of the displayedCardsIndices array
+    // initialize the object with the smallest price as the index stored in the first element of the displayedBooksIndices array
     let minIndex = i;
 
-    // for every subsequent indice stored as elements in displayedCardsIndices up to the sortRange,
+    // for every subsequent indice stored as elements in displayedBooksIndices up to the sortRange,
     // check if the book indice is already displayed
     for (let j = i + 1; j < sortRange; j++)
     {
-      if (cardArray[displayedCardsIndices[minIndex]].price > cardArray[displayedCardsIndices[j]].price) minIndex = j;
+      if (bookArray[displayedBooksIndices[minIndex]].price > bookArray[displayedBooksIndices[j]].price) minIndex = j;
     }
 
     // swap function to switch the element that stores the index with the minimum price with the current element we are at
-    let temp = displayedCardsIndices[i];
-    displayedCardsIndices[i] = displayedCardsIndices[minIndex];
-    displayedCardsIndices[minIndex] = temp;
+    let temp = displayedBooksIndices[i];
+    displayedBooksIndices[i] = displayedBooksIndices[minIndex];
+    displayedBooksIndices[minIndex] = temp;
     
   }
 
@@ -261,8 +261,8 @@ function updateCategoryDropdown()
   categoryOptions.length = 0;
 
   // get all the categories that are possible within the displayedCards
-  for (let i = 0; i < displayedCardsIndices.length; i++) if (!(categoryOptions.includes(cardArray[displayedCardsIndices[i]].category))) 
-    categoryOptions.push(cardArray[displayedCardsIndices[i]].category);
+  for (let i = 0; i < displayedBooksIndices.length; i++) if (!(categoryOptions.includes(bookArray[displayedBooksIndices[i]].category))) 
+    categoryOptions.push(bookArray[displayedBooksIndices[i]].category);
 
   // for every displayed card category possible, create an option for it and append it to the dropdown menu
   for (let i = 0; i < categoryOptions.length; i++)
@@ -284,14 +284,14 @@ function filterBooks(obj)
     const value = obj.target.value;
 
     // if the value inputted is inside of the categoryOptions, then get rid of all the objects indices
-    // that are not of that value within the displayedCardsIndices array
+    // that are not of that value within the displayedBooksIndices array
     if (categoryOptions.includes(value))
       {
-        for (let i = 0; i < displayedCardsIndices.length; i++)
+        for (let i = 0; i < displayedBooksIndices.length; i++)
         {
-          if (cardArray[displayedCardsIndices[i]].category != value)
+          if (bookArray[displayedBooksIndices[i]].category != value)
           {
-            displayedCardsIndices.splice(i, 1);
+            displayedBooksIndices.splice(i, 1);
             i--;
           }
         }
