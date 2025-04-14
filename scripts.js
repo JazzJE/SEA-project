@@ -1,97 +1,302 @@
-/**
- * Data Catalog Project Starter Code - SEA Stage 2
- *
- * This file is where you should be doing most of your work. You should
- * also make changes to the HTML and CSS files, but we want you to prioritize
- * demonstrating your understanding of data structures, and you'll do that
- * with the JavaScript code you write in this file.
- *
- * The comments in this file are only to help you learn how the starter code
- * works. The instructions for the project are in the README. That said, here
- * are the three things you should do first to learn about the starter code:
- * - 1 - Change something small in index.html or style.css, then reload your
- *    browser and make sure you can see that change.
- * - 2 - On your browser, right click anywhere on the page and select
- *    "Inspect" to open the browser developer tools. Then, go to the "console"
- *    tab in the new window that opened up. This console is where you will see
- *    JavaScript errors and logs, which is extremely helpful for debugging.
- *    (These instructions assume you're using Chrome, opening developer tools
- *    may be different on other browsers. We suggest using Chrome.)
- * - 3 - Add another string to the titles array a few lines down. Reload your
- *    browser and observe what happens. You should see a fourth "card" appear
- *    with the string you added to the array, but a broken image.
- *
- */
+// array that will store all the book objects
+let cardArray = [];
 
-const FRESH_PRINCE_URL =
-  "https://upload.wikimedia.org/wikipedia/en/3/33/Fresh_Prince_S1_DVD.jpg";
-const CURB_POSTER_URL =
-  "https://m.media-amazon.com/images/M/MV5BZDY1ZGM4OGItMWMyNS00MDAyLWE2Y2MtZTFhMTU0MGI5ZDFlXkEyXkFqcGdeQXVyMDc5ODIzMw@@._V1_FMjpg_UX1000_.jpg";
-const EAST_LOS_HIGH_POSTER_URL =
-  "https://static.wikia.nocookie.net/hulu/images/6/64/East_Los_High.jpg";
+// array that will store all the indices of the book objects already displayed
+let displayedCardsIndices = [];
 
-// This is an array of strings (TV show titles)
-let titles = [
-  "Fresh Prince of Bel Air",
-  "Curb Your Enthusiasm",
-  "East Los High",
-];
-// Your final submission should have much more data than this, and
-// you should use more than just an array of strings to store it all.
+// array that will store all the categories possible book objects indices stored in displayedCardsIndices
+let categoryOptions = [];
 
-// This function adds cards the page to display the data in the array
-function showCards() {
+// initialize arrays and event listener
+document.addEventListener("DOMContentLoaded", init());
+
+// initialization function
+async function init()
+{
+  // parse the dataset and assin to cardArray
+  cardArray = await parseBooks();
+
+  // event listener so when user clicks on the filter input, the value is cleared for them to type
+  const categoryInput = document.getElementById('categoryInput');
+  categoryInput.addEventListener('click', function ()
+  {
+    this.value = '';
+  });
+
+  // initialize a batch cards for when website first loads
+  addCards();
+}
+
+// parse the json into the project
+async function parseBooks() 
+{
+  try {
+    const response = await fetch("Amazon_popular_books_dataset.json");
+    const bookObjectArray = await response.json();
+
+    // only get the relevant fields for each book
+    modifiedBookObjectArray = bookObjectArray.map(book =>
+      (
+        {
+          ISBN: book.ISBN10 ?? "N/A",
+          price: book.final_price ?? "unknown",
+          imageURL: book.image_url,
+          rating: book.rating,
+          reviewsCount: book.reviews_count ?? "N/A",
+          title: book.title,
+          url: book.url,
+          author: book.brand ?? "N/A",
+          category: book.categories[1],
+        }
+      )
+    )
+    return modifiedBookObjectArray;
+  } catch {
+    alert("[ERROR] Failed to load the dataset! Please refresh.");
+  }
+}
+
+// function to update the cards that should be displayed
+function showCards() 
+{
   const cardContainer = document.getElementById("card-container");
   cardContainer.innerHTML = "";
   const templateCard = document.querySelector(".card");
 
-  for (let i = 0; i < titles.length; i++) {
-    let title = titles[i];
-
-    // This part of the code doesn't scale very well! After you add your
-    // own data, you'll need to do something totally different here.
-    let imageURL = "";
-    if (i == 0) {
-      imageURL = FRESH_PRINCE_URL;
-    } else if (i == 1) {
-      imageURL = CURB_POSTER_URL;
-    } else if (i == 2) {
-      imageURL = EAST_LOS_HIGH_POSTER_URL;
-    }
-
+  // display every book that has an index stored as an element inside of the displayedCardsIndices array
+  for (let i = 0; i < displayedCardsIndices.length; i++) 
+  {
     const nextCard = templateCard.cloneNode(true); // Copy the template card
-    editCardContent(nextCard, title, imageURL); // Edit title and image
-    cardContainer.appendChild(nextCard); // Add new card to the container
+    editCardContent
+    (
+      {
+        card: nextCard, 
+        ISBN: cardArray[displayedCardsIndices[i]].ISBN, 
+        imageURL: cardArray[displayedCardsIndices[i]].imageURL, 
+        title: cardArray[displayedCardsIndices[i]].title,
+        author: cardArray[displayedCardsIndices[i]].author,
+        category: cardArray[displayedCardsIndices[i]].category,
+        price: cardArray[displayedCardsIndices[i]].price,
+        rating: cardArray[displayedCardsIndices[i]].rating,
+        reviewsCount: cardArray[displayedCardsIndices[i]].reviewsCount,
+        url: cardArray[displayedCardsIndices[i]].url,
+      }
+    ); // edit the card to have the book object i's information stored as an element of displayedCardsIndices
+    cardContainer.appendChild(nextCard); // add the new card to the container
+  }
+
+  // update the category input to only consider the displayed cards categories
+  updateCategoryDropdown();
+}
+
+// function to delete the last card and redisplay
+function removeLastCard() 
+{
+  // check if there actually are any cards being displayed
+  if (displayedCardsIndices.length == 0)
+  {
+    alert("[ERROR] There are no cards currently displayed!");
+  }
+
+  // else, continue to remove the last card and re-render the cards
+  else
+  {
+    displayedCardsIndices.pop();
+    showCards();
   }
 }
 
-function editCardContent(card, newTitle, newImageURL) {
+// edit the inputted card
+function editCardContent({card, imageURL, title, category, ISBN, price, rating, reviewsCount, url, author}) 
+{
   card.style.display = "block";
 
   const cardHeader = card.querySelector("h2");
-  cardHeader.textContent = newTitle;
+  cardHeader.textContent = title;
 
   const cardImage = card.querySelector("img");
-  cardImage.src = newImageURL;
-  cardImage.alt = newTitle + " Poster";
+  cardImage.src = imageURL;
+  cardImage.alt = "'" + title + "'" + " Image";
 
-  // You can use console.log to help you debug!
-  // View the output by right clicking on your website,
-  // select "Inspect", then click on the "Console" tab
-  console.log("new card:", newTitle, "- html: ", card);
-}
+  const list = card.querySelector("ul");
 
-// This calls the addCards() function when the page is first loaded
-document.addEventListener("DOMContentLoaded", showCards);
+  const authorPoint = card.querySelector("li:nth-child(1)");
+  authorPoint.innerHTML = '<b>Author:</b> ' + author;
 
-function quoteAlert() {
-  console.log("Button Clicked!");
-  alert(
-    "I guess I can kiss heaven goodbye, because it got to be a sin to look this good!"
+  const categoryPoint = card.querySelector("li:nth-child(2)");
+  categoryPoint.innerHTML = '<b>Category:</b> ' + category;
+
+  const ratingPoint = card.querySelector("li:nth-child(3)");
+  ratingPoint.innerHTML = '<b>Rating: </b>' + rating;
+
+  const reviewsPoint = card.querySelector("li:nth-child(4)");
+  reviewsPoint.innerHTML = '<b>Number of Reviews: </b>' + reviewsCount;
+
+  const ISBNPoint = card.querySelector("li:nth-child(5)");
+  ISBNPoint.innerHTML = '<b>ISBN #: </b>' + ISBN;
+
+  const pricePoint = card.querySelector("li:nth-child(6)");
+  (price === null)? (pricePoint.innerHTML = '<b>Price (2022): </b>unknown'): (pricePoint.innerHTML = '<b>Price (2022): </b>$' + price);
+
+  const purchaseButton = card.querySelector("button");
+
+  // when the user clicks on the purchase button, send them to the relevant Amazon url to purchase
+  purchaseButton.addEventListener
+  (
+    "click", 
+    function() { window.open(url, '_blank')}
   );
 }
 
-function removeLastCard() {
-  titles.pop(); // Remove last item in titles array
-  showCards(); // Call showCards again to refresh
+// function to add ten cards to the display
+function addCards()
+{
+  for (let j = 0; j < 10; j++)
+  {
+    
+    // if all the cards are displayed, simply do nothing and output an error
+    if (cardArray.length == displayedCardsIndices.length)
+    {
+      alert("[ERROR] All the cards are displayed!");
+      break;
+    }
+
+    // else, add a card
+    else
+    {
+      const cardContainer = document.getElementById("card-container");
+      const templateCard = document.querySelector(".card");
+
+      // generate a random book index within the range of the data set
+      let rand = Math.floor(Math.random() * cardArray.length);
+
+      // ensure that the random indice is not already an element inside of the displayedCardsIndices array
+      // if already inside (ergo displayed), then reassign rand to a new book index and reperform if the new values is in the array
+      for (let i = 0; i < displayedCardsIndices.length; i++)
+      {
+        if (rand == displayedCardsIndices[i])
+        {
+          rand = Math.floor(Math.random() * cardArray.length);
+          i = -1;
+        }
+      }
+
+      // add the random/new book index to the array of displayed indices
+      displayedCardsIndices.push(rand);
+
+      // create the new card with the random book index
+      const nextCard = templateCard.cloneNode(true); // copy template
+      editCardContent
+      (
+        {
+        card: nextCard,
+        ISBN: cardArray[rand].ISBN, 
+        imageURL: cardArray[rand].imageURL, 
+        title: cardArray[rand].title,
+        author: cardArray[rand].author,
+        category: cardArray[rand].category,
+        price: cardArray[rand].price,
+        rating: cardArray[rand].rating,
+        reviewsCount: cardArray[rand].reviewsCount,
+        url: cardArray[rand].url,
+        }
+      ); // edit the card with index rand's object
+      cardContainer.appendChild(nextCard); // add new card to the container
+    }
+  }
+
+  // update the category input to only consider the displayed cards categories
+  updateCategoryDropdown();
 }
+
+// sort the displayed cards from lowest to highest price using linear sort
+function sortByPrice()
+{
+  // this is a range value so that when objects with null prices are appended to the end of the displayedCardIndices list,
+  // we can exclude these objects from being observed and sorted
+  let sortRange = displayedCardsIndices.length;
+  
+  // place all the objects with unknown values for price at the end of the displayed cards, and decrease the range we will sort through
+  for (let i = 0; i < sortRange; i++)
+  {
+    if (cardArray[displayedCardsIndices[i]].price == "unknown") 
+    {
+      displayedCardsIndices.push((displayedCardsIndices.splice(i, 1))[0]);
+      i--;
+      sortRange--;
+    }
+  }
+
+  // use a linear sort to sort the books that we know from smallest to greatest in price
+  for (let i = 0; i < sortRange - 1; i++)
+  {
+    // initialize the object with the smallest price as the index stored in the first element of the displayedCardsIndices array
+    let minIndex = i;
+
+    // for every subsequent indice stored as elements in displayedCardsIndices up to the sortRange,
+    // check if the book indice is already displayed
+    for (let j = i + 1; j < sortRange; j++)
+    {
+      if (cardArray[displayedCardsIndices[minIndex]].price > cardArray[displayedCardsIndices[j]].price) minIndex = j;
+    }
+
+    // swap function to switch the element that stores the index with the minimum price with the current element we are at
+    let temp = displayedCardsIndices[i];
+    displayedCardsIndices[i] = displayedCardsIndices[minIndex];
+    displayedCardsIndices[minIndex] = temp;
+    
+  }
+
+  // update the displayed cards
+  showCards();
+}
+
+// update the dropdown menu to only include the categories of the book objects
+function updateCategoryDropdown()
+{
+  const categoryDropdown = document.getElementById('categoryDropdown');
+  categoryDropdown.innerHTML = "";
+
+  // reset the categoryOptions
+  categoryOptions.length = 0;
+
+  // get all the categories that are possible within the displayedCards
+  for (let i = 0; i < displayedCardsIndices.length; i++) if (!(categoryOptions.includes(cardArray[displayedCardsIndices[i]].category))) 
+    categoryOptions.push(cardArray[displayedCardsIndices[i]].category);
+
+  // for every displayed card category possible, create an option for it and append it to the dropdown menu
+  for (let i = 0; i < categoryOptions.length; i++)
+  {
+    newOption = document.createElement("option");
+    newOption.value = categoryOptions[i];
+    categoryDropdown.appendChild(newOption);
+  }
+
+  // event listener for when the user inputs a value to filter with, where it is updated to only the categories of the displayedCards
+  const categoryInput = document.getElementById('categoryInput');
+  categoryInput.removeEventListener('input', filterBooks);
+  categoryInput.addEventListener('input', filterBooks);
+}
+
+// filter the books based on the category inputted within the dropdown list and the categories that are possible in the categoryOptions
+function filterBooks(obj)
+  {
+    const value = obj.target.value;
+
+    // if the value inputted is inside of the categoryOptions, then get rid of all the objects indices
+    // that are not of that value within the displayedCardsIndices array
+    if (categoryOptions.includes(value))
+      {
+        for (let i = 0; i < displayedCardsIndices.length; i++)
+        {
+          if (cardArray[displayedCardsIndices[i]].category != value)
+          {
+            displayedCardsIndices.splice(i, 1);
+            i--;
+          }
+        }
+
+        // update the displayed cards
+        showCards();
+    }
+  }

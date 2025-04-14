@@ -1,31 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>LA TV Shows | Home</title>
+    <title>Book Randomizer!</title>
     <meta name="description" content="A Catalog of Shows Set in Los Angeles" />
     <link rel="stylesheet" href="style.css" />
     <script type="text/javascript" src="scripts.js"></script>
   </head>
 
   <body>
+
+    <div id="navigationButtonBox">  
+      <button onclick="removeLastCard();">Remove A Book!</button>
+      <button onclick="addCards();">Add Ten Books!</button>
+      <div id="categoryDropdownBox">
+        <label id="categoryLabel" for="categoryDropdown">Filter Displayed Books (Category):</label>
+        <input list="categoryDropdown" id="categoryInput" placeholder="Search a category...">
+        <datalist id="categoryDropdown"></datalist>
+      </div>
+      <button onclick="sortByPrice();">Sort by Price!</button>
+    </div>
+
     <header class="main-header">
-      <h1 class="title">LA TV Shows</h1>
+      <h1 class="title"><b>Discover New Books!</b></h1>
     </header>
+
     <div id="card-container"></div>
     <div class="card" style="display: none">
       <div class="card-content">
-        <h2>TV Show Title</h2>
-        <img src="" alt="TV Show Poster" />
+        <h2>Book Title</h2>
+        <img src="" alt="Book Image" />
         <ul>
-          <li>Bullet Point 1</li>
-          <li>Bullet Point 2</li>
-          <li>Bullet Point 3</li>
+          <li>Author</li>
+          <li>Category</li>
+          <li>Rating</li>
+          <li># of Reviews</li>
+          <li>ISBN</li>
+          <li>Price</li>
         </ul>
+        <button id="purchaseButton">Purchase!</button>
       </div>
     </div>
     <div class="footer">
-      <button onclick="quoteAlert();">Get A Quote!</button>
-      <button onclick="removeLastCard();">Remove A Card!</button>
     </div>
   </body>
 </html>
