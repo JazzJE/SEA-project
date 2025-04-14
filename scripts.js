@@ -4,52 +4,56 @@ let cardArray = [];
 // array that will store all the indices of the book objects already displayed
 let displayedCardsIndices = [];
 
-// array that will store all the categories possible in the book indices stored as elements displayedCardsIndices array
+// array that will store all the categories possible book objects indices stored in displayedCardsIndices
 let categoryOptions = [];
 
-// initialize arrays and relevant buttons
+// initialize arrays and event listener
 document.addEventListener("DOMContentLoaded", init());
 
 // initialization function
 async function init()
 {
-  // cardArray will store all each book as objects
+  // parse the dataset and assin to cardArray
   cardArray = await parseBooks();
 
-  // clear the category dropdown when selected
+  // event listener so when user clicks on the filter input, the value is cleared for them to type
   const categoryInput = document.getElementById('categoryInput');
   categoryInput.addEventListener('click', function ()
   {
     this.value = '';
   });
 
-  // initialize cards for when website first loads
+  // initialize a batch cards for when website first loads
   addCards();
 }
 
 // parse the json into the project
 async function parseBooks() 
 {
-  const response = await fetch("Amazon_popular_books_dataset.json");
-  const bookObjectArray = await response.json();
+  try {
+    const response = await fetch("Amazon_popular_books_dataset.json");
+    const bookObjectArray = await response.json();
 
-  // only get the relevant fields for each book
-  modifiedBookObjectArray = bookObjectArray.map(book =>
-    (
-      {
-        ISBN: book.ISBN10 ?? "N/A",
-        price: book.final_price ?? "unknown",
-        imageURL: book.image_url,
-        rating: book.rating,
-        reviewsCount: book.reviews_count ?? "N/A",
-        title: book.title,
-        url: book.url,
-        author: book.brand ?? "N/A",
-        category: book.categories[1],
-      }
+    // only get the relevant fields for each book
+    modifiedBookObjectArray = bookObjectArray.map(book =>
+      (
+        {
+          ISBN: book.ISBN10 ?? "N/A",
+          price: book.final_price ?? "unknown",
+          imageURL: book.image_url,
+          rating: book.rating,
+          reviewsCount: book.reviews_count ?? "N/A",
+          title: book.title,
+          url: book.url,
+          author: book.brand ?? "N/A",
+          category: book.categories[1],
+        }
+      )
     )
-  )
-  return modifiedBookObjectArray;
+    return modifiedBookObjectArray;
+  } catch {
+    alert("[ERROR] Failed to load the dataset! Please refresh.");
+  }
 }
 
 // function to update the cards that should be displayed
@@ -77,10 +81,11 @@ function showCards()
         reviewsCount: cardArray[displayedCardsIndices[i]].reviewsCount,
         url: cardArray[displayedCardsIndices[i]].url,
       }
-    ); // edit the card with relevant information
-    cardContainer.appendChild(nextCard); // Add new card to the container
+    ); // edit the card to have the book object i's information stored as an element of displayedCardsIndices
+    cardContainer.appendChild(nextCard); // add the new card to the container
   }
 
+  // update the category input to only consider the displayed cards categories
   updateCategoryDropdown();
 }
 
@@ -111,7 +116,7 @@ function editCardContent({card, imageURL, title, category, ISBN, price, rating, 
 
   const cardImage = card.querySelector("img");
   cardImage.src = imageURL;
-  cardImage.alt = title + " Image";
+  cardImage.alt = "'" + title + "'" + " Image";
 
   const list = card.querySelector("ul");
 
@@ -131,7 +136,7 @@ function editCardContent({card, imageURL, title, category, ISBN, price, rating, 
   ISBNPoint.innerHTML = '<b>ISBN #: </b>' + ISBN;
 
   const pricePoint = card.querySelector("li:nth-child(6)");
-  (price === null)? (pricePoint.innerHTML = '<b>Price (2022): </b>unknown'): (pricePoint.innerHTML = '<b>Price (2022): </b>' + price);
+  (price === null)? (pricePoint.innerHTML = '<b>Price (2022): </b>unknown'): (pricePoint.innerHTML = '<b>Price (2022): </b>$' + price);
 
   const purchaseButton = card.querySelector("button");
 
@@ -141,8 +146,6 @@ function editCardContent({card, imageURL, title, category, ISBN, price, rating, 
     "click", 
     function() { window.open(url, '_blank')}
   );
-
-  console.log("new card:", title, "- html: ", card);
 }
 
 // function to add ten cards to the display
@@ -152,7 +155,7 @@ function addCards()
   {
     
     // if all the cards are displayed, simply do nothing and output an error
-    if (cardArray.length === displayedCardsIndices.length)
+    if (cardArray.length == displayedCardsIndices.length)
     {
       alert("[ERROR] All the cards are displayed!");
       break;
@@ -167,8 +170,8 @@ function addCards()
       // generate a random book index within the range of the data set
       let rand = Math.floor(Math.random() * cardArray.length);
 
-      // ensure that the random book indice is not already an element inside of the displayedCardsIndices array
-      // if already inside (ergo displayed), then reassign rand to a new book index and reperform check through the array
+      // ensure that the random indice is not already an element inside of the displayedCardsIndices array
+      // if already inside (ergo displayed), then reassign rand to a new book index and reperform if the new values is in the array
       for (let i = 0; i < displayedCardsIndices.length; i++)
       {
         if (rand == displayedCardsIndices[i])
@@ -178,11 +181,11 @@ function addCards()
         }
       }
 
-      // add the new book index to the array of displayed indices
+      // add the random/new book index to the array of displayed indices
       displayedCardsIndices.push(rand);
 
-      // create the new card with the book index
-      const nextCard = templateCard.cloneNode(true); // Copy the template card
+      // create the new card with the random book index
+      const nextCard = templateCard.cloneNode(true); // copy template
       editCardContent
       (
         {
@@ -197,11 +200,12 @@ function addCards()
         reviewsCount: cardArray[rand].reviewsCount,
         url: cardArray[rand].url,
         }
-      ); // display the rand object
-      cardContainer.appendChild(nextCard); // Add new card to the container
+      ); // edit the card with index rand's object
+      cardContainer.appendChild(nextCard); // add new card to the container
     }
   }
 
+  // update the category input to only consider the displayed cards categories
   updateCategoryDropdown();
 }
 
@@ -212,7 +216,7 @@ function sortByPrice()
   // we can exclude these objects from being observed and sorted
   let sortRange = displayedCardsIndices.length;
   
-  // place all the objects with unknown values for price at the end of the displayed cards
+  // place all the objects with unknown values for price at the end of the displayed cards, and decrease the range we will sort through
   for (let i = 0; i < sortRange; i++)
   {
     if (cardArray[displayedCardsIndices[i]].price == "unknown") 
@@ -229,13 +233,14 @@ function sortByPrice()
     // initialize the object with the smallest price as the index stored in the first element of the displayedCardsIndices array
     let minIndex = i;
 
-    // for every subsequent indice stored as elements in displayedCardsIndices, check if the book indice is already displayed
+    // for every subsequent indice stored as elements in displayedCardsIndices up to the sortRange,
+    // check if the book indice is already displayed
     for (let j = i + 1; j < sortRange; j++)
     {
       if (cardArray[displayedCardsIndices[minIndex]].price > cardArray[displayedCardsIndices[j]].price) minIndex = j;
     }
 
-    // swap function to switch the minimum value with the current value we are at
+    // swap function to switch the element that stores the index with the minimum price with the current element we are at
     let temp = displayedCardsIndices[i];
     displayedCardsIndices[i] = displayedCardsIndices[minIndex];
     displayedCardsIndices[minIndex] = temp;
@@ -246,7 +251,7 @@ function sortByPrice()
   showCards();
 }
 
-// update the dropdown menu to only the elements that are displayed
+// update the dropdown menu to only include the categories of the book objects
 function updateCategoryDropdown()
 {
   const categoryDropdown = document.getElementById('categoryDropdown');
@@ -267,7 +272,7 @@ function updateCategoryDropdown()
     categoryDropdown.appendChild(newOption);
   }
 
-  // event listener for when the user inputs a value to filter with, re-render the displayed cards only with those categories
+  // event listener for when the user inputs a value to filter with, where it is updated to only the categories of the displayedCards
   const categoryInput = document.getElementById('categoryInput');
   categoryInput.removeEventListener('input', filterBooks);
   categoryInput.addEventListener('input', filterBooks);
@@ -277,6 +282,9 @@ function updateCategoryDropdown()
 function filterBooks(obj)
   {
     const value = obj.target.value;
+
+    // if the value inputted is inside of the categoryOptions, then get rid of all the objects indices
+    // that are not of that value within the displayedCardsIndices array
     if (categoryOptions.includes(value))
       {
         for (let i = 0; i < displayedCardsIndices.length; i++)
@@ -287,6 +295,8 @@ function filterBooks(obj)
             i--;
           }
         }
+
+        // update the displayed cards
         showCards();
     }
   }

@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Discover New Books!</title>
+    <title>Book Randomizer!</title>
     <meta name="description" content="A Catalog of Shows Set in Los Angeles" />
     <link rel="stylesheet" href="style.css" />
     <script type="text/javascript" src="scripts.js"></script>
   </head>
 
   <body>
-    <header class="main-header">
-      <h1 class="title">Discover New Books!</h1>
+
+    <div id="navigationButtonBox">  
       <button onclick="removeLastCard();">Remove A Book!</button>
       <button onclick="addCards();">Add Ten Books!</button>
-      <div>
-        <label for="categoryDropdown">Filter Displayed Books (Category): </label>
-        <input list="categoryDropdown" id="categoryInput" placeholder="Type or select a category...">
+      <div id="categoryDropdownBox">
+        <label id="categoryLabel" for="categoryDropdown">Filter Displayed Books (Category):</label>
+        <input list="categoryDropdown" id="categoryInput" placeholder="Search a category...">
         <datalist id="categoryDropdown"></datalist>
       </div>
       <button onclick="sortByPrice();">Sort by Price!</button>
+    </div>
+
+    <header class="main-header">
+      <h1 class="title"><b>Discover New Books!</b></h1>
     </header>
+
     <div id="card-container"></div>
     <div class="card" style="display: none">
       <div class="card-content">
@@ -27,12 +32,12 @@
         <ul>
           <li>Author</li>
           <li>Category</li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
+          <li>Rating</li>
+          <li># of Reviews</li>
+          <li>ISBN</li>
+          <li>Price</li>
         </ul>
-        <button>Purchase!</button>
+        <button id="purchaseButton">Purchase!</button>
       </div>
     </div>
     <div class="footer">
