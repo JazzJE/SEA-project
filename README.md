@@ -12,4 +12,4 @@
   - **Sorting books/cards:** Use a linear sort to reorder the displayed object indices that are smallest in price to greatest
 
 ## 🗃️ Dataset Used
-- Refer to this repo: [Amazon-popular-books-dataset](https://github.com/luminati-io/Amazon-popular-books-dataset)
+- Refer to this repo of >2000 books: [Amazon-popular-books-dataset](https://github.com/luminati-io/Amazon-popular-books-dataset)
